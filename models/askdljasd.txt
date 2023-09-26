@@ -1,0 +1,11 @@
+  companyName, 
+  duplicate, 
+   website , 
+    industry , 
+    industry2 , 
+    companyLinkedIn,
+    Region,
+    Country,
+    name,
+    date,
+    

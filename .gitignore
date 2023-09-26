@@ -1,0 +1,12 @@
+# Ignore specific files
+file.txt
+secret.txt
+
+# Ignore files with a specific extension
+*.log
+*.tmp
+*.db
+
+# Ignore a directory and its content
+node_modules/
+

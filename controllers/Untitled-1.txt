@@ -1,0 +1,126 @@
+
+
+  const createDeposit = async (req, res) => {
+    const { 
+  
+      
+  
+    network,
+    currency,
+    address,
+  
+  
+     } = req.body;
+   
+    try {
+     
+  
+      if(address ==="")
+      {   return res
+        .status(401)
+        .json({ message: "Cannot Create Deposit with empty address" });
+        
+      }
+
+
+      const checkSameDeposit= await Deposit.findOne({ network: network });
+  
+      if (checkSameDeposit) {
+        return res
+          .status(401)
+          .json({ message: "Cannot Create Deposit with same Network" });
+      }
+  
+  
+      const deposit = Deposit.create({
+       
+  
+   
+          network,
+          currency,
+          address,
+  
+      });
+      res.status(200).send({ message: "Deposit Created!" });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+
+  const updateDepositbyID = async (req, res) => {
+    const {  
+  
+  
+      network,
+      currency,
+      address,
+      id 
+  
+  } = req.body;
+    try {
+      const filter = { id: id };
+  
+      const checkSameDeposit = await Deposit.findOne({ network: network });
+  
+  
+        const deposit = await Deposit.findOneAndUpdate(filter, {
+           
+  
+      network,
+      currency,
+      address,
+  
+  
+        });
+  
+        res.status(200).send({ message: "Deposit Updated!" });
+        return true;
+  
+      
+  
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const deleteDepositById = (req, res) => {
+    const { ID } = req.body;
+    try {
+      let deposit = Deposit.findOneAndRemove({ _id: ID })
+        .then((element) => {
+          console.log("Deposit deleted:", element);
+        })
+        .catch((error) => {
+          console.error("Error deleting Company:", error);
+        });
+  
+      res.status(200).send({ message: "Deposit Deleted!" });
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({ message: "Deposit Cannot be Deleted!" });
+    }
+  };
+  
+
+  const  getDepositRules = async (req, res) => {
+    try {
+      const deposit = await Deposit.find({},{limit:1,currency:1,network:1,address:1});
+  
+      if (!deposit) {
+        return res.status(401).json({ message: "No Deposit Found" });
+      } else {
+        res.json({ message: "Successfully Get All Deposit", deposit });
+      }
+    } catch (err) {
+      return res.status(401).json({ message: "Deposits Error" });
+    }
+
+    
+
+
+
+  };
+  
