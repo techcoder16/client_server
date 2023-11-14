@@ -527,10 +527,15 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       // Perform any additional data processing if needed
       
       console.log(data);
-      const newaa = [data['__EMPTY'],
+      const newaa = [
+        data['__EMPTY'],
     
     data['__EMPTY_1'],
+    data['__EMPTY_2'],
+    
     data['__EMPTY_3'],
+    data['__EMPTY_4'],
+    
     data['__EMPTY_5'],
     data['__EMPTY_6'],
     data['__EMPTY_7'],
@@ -538,6 +543,8 @@ const workbook = xlsx.readFile(file.destination+file.filename);
     data['__EMPTY_9'],
     data['__EMPTY_10'],
     data['__EMPTY_11'],
+    data['__EMPTY_12'],
+    
     data['__EMPTY_13'],
     data['__EMPTY_19'],
     data['__EMPTY_20'],
@@ -568,31 +575,34 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       industry1:  newaa[1],
       
       
+      industry2:  newaa[2],
+
       jobRole:  newaa[2],
     
-      phoneNumber:  newaa[3],
-      city:  newaa[4],
-      region:  newaa[5],
-      country:  newaa[6],
+      phoneNumber:  newaa[4],
+      city:  newaa[5],
+      region:  newaa[6],
+      country:  newaa[7],
       
       
       
-      website:  newaa[7],
+      website:  newaa[8],
       
-      date:  newaa[8],
-      
-      empcount:  newaa[9],
+      empcount:  newaa[11],
     
       industry2:  newaa[10],
       
       
-      linkedin:  newaa[11],
+      linkedin:  newaa[13],
       
-      email:  newaa[12],
-      remarks: newaa[13],
+      date:  newaa[12],
+
+      email:  newaa[14],
+      
+      remarks: newaa[15],
     
-      firstName:  newaa[14],
-      lastName:  newaa[15],
+      firstName:  newaa[16],
+      lastName:  newaa[17],
     
     }
 
