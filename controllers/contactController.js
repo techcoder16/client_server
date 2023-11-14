@@ -1,4 +1,12 @@
 const Contact = require("../models/Contact");
+const fastcsv = require('fast-csv');
+const fs = require('fs');
+
+
+const xlsx = require('xlsx');
+const { Readable } = require('stream');
+
+
 
 // const getContact = async (req, res) => {
 //   try {
@@ -121,11 +129,19 @@ const updateContact = async ()=>{
     }
   ]);
 
-  
- 
+
+  try
+  {
   for (const doc of aggregatePipeline) {
+    console.log(doc)
+
     await Contact.updateOne({ _id: doc.id }, { $set: { duplicate: doc.duplicate } });
   }
+}
+catch (err)
+{
+  console.log("ASdasd",err);
+}
   
   
 }
@@ -154,6 +170,7 @@ const createContact = async (req, res) => {
 
     jobRole,
     email,
+    remarks,
   } = req.body;
 
   try {
@@ -172,14 +189,20 @@ const createContact = async (req, res) => {
       firstName == "" ||
       lastName == "" ||
       jobRole == "" ||
-      email == ""
+      email == "" || 
+      remarks == ""
     ) {
       res.status(401).send({ message: "Field Empty!" });
       return;
     }
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
+let dateNew =      today.toISOString();
 
+
+    console.log(timeElapsed.toString());
     const contact = Contact.create({
-      date,
+      dateNew,
 
       name,
 
@@ -201,11 +224,41 @@ const createContact = async (req, res) => {
 
       jobRole,
       email,
+      remarks,
     });
+
+    
+    console.log({date,
+
+      name,
+
+      website,
+
+      industry1,
+
+      industry2,
+
+      empcount,
+
+      phoneNumber,
+      linkedin,
+      city,
+      region,
+      country,
+      firstName,
+      lastName,
+
+      jobRole,
+      email,
+      remarks,
+    })
+
+    
    await updateContact();
+
     res.status(200).send({ message: "Contact Created!" });
   } catch (error) {
-    console.log(error);
+    console.log("ASdad",error);
   }
 };
 const updateContactbyID = async (req, res) => {
@@ -231,6 +284,7 @@ const updateContactbyID = async (req, res) => {
 
     jobRole,
     email,
+    remarks,
   id } = req.body;
   try {
     const filter = { _id: id };
@@ -258,7 +312,10 @@ const updateContactbyID = async (req, res) => {
 
       jobRole,
       email,
+      remarks,
     });
+
+    console.log(remarks);
 
     await updateContact();
 
@@ -393,51 +450,187 @@ const getAllFilters = async (req, res) => {
 
 
 const upliftData = async (req, res) => {
+
+  const file = req.file;
+
+  console.log(file);
   const { data } = req.body;
 
   
   try {
    
 
-    if (data) {
-      data.map(async (element) => {
+
+
+
+        // try {
+      //     const contact = await Contact.create({
+      //       name :element[0],
+      //       wesbite: element[1],
+      //       industry1: element[2],
+      //      industry2:  element[3],
+      //       empcount: element[4],
+      //       phoneNumber : element[5],
+      //       linkedin: element[6],
+      //      city: element[7],
+      //      region: element[8],
+      //      country: element[9],
+      //      firstName: element[10],
+      //      lastName: element[11],
+      //      jobRole: element[12],
         
+      //       duplicate:false,
 
-
-
-        try {
-          const contact = await Contact.create({
-            name :element[0],
-            wesbite: element[1],
-            industry1: element[2],
-           industry2:  element[3],
-            empcount: element[4],
-            phoneNumber : element[5],
-            linkedin: element[6],
-           city: element[7],
-           region: element[8],
-           country: element[9],
-           firstName: element[10],
-           lastName: element[11],
-           jobRole: element[12],
-        
-            duplicate:false,
-
-          }
+      //     }
             
             
-          );
-          await updateContact();
+      //     );
+      //     await updateContact();
 
-        } catch (error) {}
-      });
+      //   } catch (error) {}
+      // })
 
- 
+
+console.log(file.destination+file.filename);
+
+
+
+const workbook = xlsx.readFile(file.destination+file.filename);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+
+  const stream = xlsx.stream.to_json(worksheet);
+
+  const readableStream = new Readable({ objectMode: true });
+  readableStream._read = () => {};
+  stream.on('data', (data) => readableStream.push((data)));
+  stream.on('end', () => readableStream.push(null));
+
+
+  const writableStream = Contact.collection.initializeOrderedBulkOp();
+
+  
+  function removeEmptyProperties(data) {
+    // Filter out properties with empty values
+    return Object.keys(data)
+      .filter(key => data[key] !== '')
+      .reduce((obj, key) => {
+        obj[key] = data[key];
+        return obj;
+      }, {});
+  }
+  
+  
+
+  readableStream.on('data', async (data) => {
+    try {
+      // Perform any additional data processing if needed
+      
+      console.log(data);
+      const newaa = [data['__EMPTY'],
+    
+    data['__EMPTY_1'],
+    data['__EMPTY_3'],
+    data['__EMPTY_5'],
+    data['__EMPTY_6'],
+    data['__EMPTY_7'],
+    data['__EMPTY_8'],
+    data['__EMPTY_9'],
+    data['__EMPTY_10'],
+    data['__EMPTY_11'],
+    data['__EMPTY_13'],
+    data['__EMPTY_19'],
+    data['__EMPTY_20'],
+    data['__EMPTY_21'],
+    data['__EMPTY_22'],
+
+    
+    ]
+
+
+    const obj = newaa.reduce((acc, value, index) => {
+      acc[index] = value;
+      return acc;
+    }, {});
+    
+
+    
+
+    console.log(obj)
+
+// const newdata = [data['_E']]
+
+
+
+
+    const document = new Contact({
+      name: newaa[0],
+      industry1:  newaa[1],
+      
+      
+      jobRole:  newaa[2],
+    
+      phoneNumber:  newaa[3],
+      city:  newaa[4],
+      region:  newaa[5],
+      country:  newaa[6],
+      
+      
+      
+      website:  newaa[7],
+      
+      date:  newaa[8],
+      
+      empcount:  newaa[9],
+    
+      industry2:  newaa[10],
+      
+      
+      linkedin:  newaa[11],
+      
+      email:  newaa[12],
+      remarks: newaa[13],
+    
+      firstName:  newaa[14],
+      lastName:  newaa[15],
+    
+    }
+
+      
+
+    );
+    
+
+     console.log('Mongoose Document:', document.toObject());
+        
+
+       writableStream.insert(document.toObject());
+
+    } catch (error) {
+      console.error('Error processing data:', error);
+    }
+  });
+
+
+
+  readableStream.on('end', async () => {
+    try {
+      // Execute the bulk insert
+      await writableStream.execute();
+      console.log('Upload complete. Closing MongoDB connection.');
+      
+    } catch (error) {
+      console.error('MongoDB stream error:', error);
+    }
+  });
+
+
+
+
+  
 
       res.status(200).send({ message: "Contact Uplift Successfully!" });
-    } else {
-      res.status(401).send({ message: "Contact Uplift Failed!" });
-    }
+    
   } catch (err) {
     res.status(401).send({ message: "Contact Uplift Failed!" });
   }
