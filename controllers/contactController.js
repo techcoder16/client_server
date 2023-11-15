@@ -499,7 +499,7 @@ const upliftData = async (req, res) => {
     console.log("hahaah",file);
    return res.status(401).send({ message: "Empty File" });
       
-   
+
 console.log("asdasdad");
   }
 
@@ -552,8 +552,9 @@ const workbook = xlsx.readFile(file.destination+file.filename);
 
   const readableStream = new Readable({ objectMode: true });
   readableStream._read = () => {};
-  stream.on('data', (data) => readableStream.push((data)));
+  stream.on('data', (data) => {   console.log("Asd",data);   readableStream.push((data))  }                   )  ;
   stream.on('end', () => readableStream.push(null));
+
 
 
   const writableStream = Contact.collection.initializeOrderedBulkOp();
@@ -569,6 +570,7 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       }, {});
   }
   
+  let max = 0;
   
 
   readableStream.on('data', async (data) => {
@@ -579,89 +581,61 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       const newaa = Object.values(data)
 
 
-    const obj = newaa.reduce((acc, value, index) => {
-      acc[index] = value;
-      return acc;
-    }, {});
+    // const obj = newaa.reduce((acc, value, index) => {
+    //   acc[index] = value;
+    //   return acc;
+    // }, {});
     
 
+      if(max<newaa.length) {
+      max = newaa.length;
+      }
   
-const document = new Contact({ srno: newaa [0],
-   date:newaa[1],
-   name: newaa[2],
-   industry1: newaa[3],
-   industry2:newaa[4],
-   empcount: newaa[5],
-   phoneNumber: newaa[6],
-   website: newaa[7],
-   companyLinkedin: newaa[8],
-   city:   newaa[9],
-   country: newaa[10],
-   firstName: newaa[11],
-   lastName: newaa[12],
-   jobRole:   newaa[13],
-   email: newaa[14],
-   quality:  newaa[15],
-   result:  newaa[16],
-   free: newaa[17],
-   role: newaa[18],
-   phoneNumber2: newaa[19],
-    recordMarksheet : newaa[20]
+
+    console.log(max      );
+    if(newaa.length < max)
+    {
+
+
+      // console.log(data);
+    }
+
+const document = new Contact({
+  srno: data['Sr #'],
+   date:data['Date'],
+   name: data['Company Name'],
+   industry1: data['Industry 1'],
+   industry2:data['Industry 1'],
+   empcount: data['Emp Count'],
+   phoneNumber: data['Phone Number'],
+   website: data['Company Website'],
+   companyLinkedin: data['Company LinkedIn'],
+   city:   data['City'],
+   
+
+   country: data['Country'],
+   firstName: data['First Name'],
+   lastName: data['Last Name'],
+   jobRole:   data['Job Role'],
+   email: data['Email'],
+   quality:  data['quality'],
+   result:  data['result'],
+   free: data['free'],
+   role: data['role'],
+   phoneNumber2: data['Phone Number 2'],
+
+   linkedin: data['Linkedin'],
+   remarks: data['Remarks'],
+    recordMarksheet : data['Record in Mastersheet']
+
+
   });
 
 
 
 
 
-
-// const newdata = [data['_E']]
-
-
-
-
-    // const document = new Contact({
-    //   name: newaa[0],
-    //   industry1:  newaa[1],
-      
-      
-    //   industry2:  newaa[2],
-
-    //   jobRole:  newaa[2],
-    
-    //   phoneNumber:  newaa[4],
-    //   city:  newaa[5],
-    //   region:  newaa[6],
-    //   country:  newaa[7],
-      
-      
-      
-    //   website:  newaa[8],
-      
-    //   empcount:  newaa[11],
-    
-    //   industry2:  newaa[10],
-      
-      
-    //   linkedin:  newaa[13],
-      
-    //   date:  newaa[12],
-
-    //   email:  newaa[14],
-      
-    //   remarks: newaa[15],
-    
-    //   firstName:  newaa[16],
-    //   lastName:  newaa[17],
-    
-    // }
-
-      
-
-    // );
-    
-
-
-       writableStream.insert(document.toObject());
+     writableStream.insert(document.toObject());
 
 
     } catch (error) {
@@ -676,6 +650,8 @@ const document = new Contact({ srno: newaa [0],
       // Execute the bulk insert
       await writableStream.execute();
       console.log('Upload complete. Closing MongoDB connection.');
+      return res.status(200).send({ message: "Contact Uplift Successfully!" });
+
       
     } catch (error) {
       console.error('MongoDB stream error:', error);
