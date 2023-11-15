@@ -46,26 +46,41 @@ const getContact = async (req, res) => {
     if (page.selectedFilters.website !== "" &&   page.selectedFilters.website) {
       query.website = page.selectedFilters.website;
     }
-    if (page.selectedFilters.companyName !== "" && page.selectedFilters.companyName) {
-      query.companyName = page.selectedFilters.companyName;
+    if (page.selectedFilters.name !== "" && page.selectedFilters.name) {
+      query.name = page.selectedFilters.name;
     }
-    if (page.selectedFilters.industry !== "" && page.selectedFilters.industry){
-      query.industry = page.selectedFilters.industry;
+    if (page.selectedFilters.industry1 !== "" && page.selectedFilters.industry1){
+      query.industry1 = page.selectedFilters.industry1;
     }
 
     if (page.selectedFilters.industry2 !== "" && page.selectedFilters.industry2) {
       query.industry2 = page.selectedFilters.industry2;
     }
 
-    if (page.selectedFilters.Country !== "" && page.selectedFilters.Country) {
-      query.Country = page.selectedFilters.Country;
+    if (page.selectedFilters.country !== "" && page.selectedFilters.country) {
+      query.country = page.selectedFilters.country;
     }
-
-    
-    if (page.selectedFilters.Region !== "" && page.selectedFilters.Region) {
-      query.Region = page.selectedFilters.Region;
+ 
+    if (page.selectedFilters.date !== "" && page.selectedFilters.date) {
+      query.date = page.selectedFilters.date;
     }
     
+    if (page.selectedFilters.region !== "" && page.selectedFilters.region) {
+      query.region = page.selectedFilters.region;
+    }
+    
+    if (page.selectedFilters.result !== "" && page.selectedFilters.result) {
+      query.result = page.selectedFilters.result;
+    }
+    if (page.selectedFilters.free !== "" && page.selectedFilters.free) {
+      query.free = page.selectedFilters.free;
+    }
+    if (page.selectedFilters.role !== "" && page.selectedFilters.role) {
+      query.role = page.selectedFilters.role;
+    }
+    if (page.selectedFilters.quality !== "" && page.selectedFilters.quality) {
+      query.quality = page.selectedFilters.quality;
+    }
     if (page.selectedFilters.name !== "" && page.selectedFilters.name) {
       query.name = page.selectedFilters.name;
     }
@@ -149,49 +164,87 @@ catch (err)
 const createContact = async (req, res) => {
   const {
     date,
-
     name,
-
-    website,
-
     industry1,
-
     industry2,
-
     empcount,
-
     phoneNumber,
-    linkedin,
+    website,
+    companyLinkedin,
     city,
     region,
     country,
     firstName,
     lastName,
-
     jobRole,
     email,
+    quality,
+    result,
+    free,
+    role,
+    phoneNumber2,
+    linkedin,
     remarks,
+    recordMarksheet,
+
+    
   } = req.body;
 
   try {
     if (
    
-      name == "" ||
-      website == "" ||
-      industry1 == "" ||
-      industry2 == "" ||
-      empcount == "" ||
-      phoneNumber == "" ||
-      linkedin == "" ||
-      city == "" ||
-      region == "" ||
-      country == "" ||
-      firstName == "" ||
-      lastName == "" ||
-      jobRole == "" ||
-      email == "" || 
-      remarks == ""
+   
+    name ==  "" ||
+    industry1 ==  "" ||
+    industry2 ==  "" ||
+    empcount ==  "" ||
+    phoneNumber ==  "" ||
+    website ==  "" ||
+    companyLinkedin ==  "" ||
+    city ==  "" ||
+    
+    country ==  "" ||
+    firstName ==  "" ||
+    lastName ==  "" ||
+    jobRole ==  "" ||
+    email ==  "" ||
+    quality ==  "" ||
+    result ==  "" ||
+    free ==  "" ||
+    role ==  "" ||
+    phoneNumber2 ==  "" ||
+    linkedin ==  "" ||
+    remarks ==  "" ||
+    recordMarksheet ==  "" 
+    
+
+
     ) {
+      console.log({date,
+        name,
+        industry1,
+        industry2,
+        empcount,
+        phoneNumber,
+        website,
+        companyLinkedin,
+        city,
+        region,
+        country,
+        firstName,
+        lastName,
+        jobRole,
+        email,
+        quality,
+        result,
+        free,
+        role,
+        phoneNumber2,
+        linkedin,
+        remarks,
+        recordMarksheet,}
+
+      )
       res.status(401).send({ message: "Field Empty!" });
       return;
     }
@@ -202,56 +255,31 @@ let dateNew =      today.toISOString();
 
     console.log(timeElapsed.toString());
     const contact = Contact.create({
-      dateNew,
-
-      name,
-
-      website,
-
-      industry1,
-
-      industry2,
-
-      empcount,
-
-      phoneNumber,
-      linkedin,
-      city,
-      region,
-      country,
-      firstName,
-      lastName,
-
-      jobRole,
-      email,
-      remarks,
-    });
-
+      date,
+    name,
+    industry1,
+    industry2,
+    empcount,
+    phoneNumber,
+    website,
+    companyLinkedin,
+    city,
+    region,
+    country,
+    firstName,
+    lastName,
+    jobRole,
+    email,
+    quality,
+    result,
+    free,
+    role,
+    phoneNumber2,
+    linkedin,
+    remarks,
+    recordMarksheet,
     
-    console.log({date,
-
-      name,
-
-      website,
-
-      industry1,
-
-      industry2,
-
-      empcount,
-
-      phoneNumber,
-      linkedin,
-      city,
-      region,
-      country,
-      firstName,
-      lastName,
-
-      jobRole,
-      email,
-      remarks,
-    })
+    });
 
     
    await updateContact();
@@ -262,57 +290,62 @@ let dateNew =      today.toISOString();
   }
 };
 const updateContactbyID = async (req, res) => {
-  const {  date,
-
+  const {  
+    
+    date,
     name,
-
-    website,
-
     industry1,
-
     industry2,
-
     empcount,
-
     phoneNumber,
-    linkedin,
+    website,
+    companyLinkedin,
     city,
     region,
     country,
     firstName,
     lastName,
-
     jobRole,
     email,
+    quality,
+    result,
+    free,
+    role,
+    phoneNumber2,
+    linkedin,
     remarks,
+    recordMarksheet,
+    
   id } = req.body;
   try {
     const filter = { _id: id };
 
     const contact = await Contact.findOneAndUpdate(filter, {
+      
       date,
-
       name,
-
-      website,
-
       industry1,
-
       industry2,
-
       empcount,
-
       phoneNumber,
-      linkedin,
+      website,
+      companyLinkedin,
       city,
       region,
       country,
       firstName,
       lastName,
-
       jobRole,
       email,
+      quality,
+      result,
+      free,
+      role,
+      phoneNumber2,
+      linkedin,
       remarks,
+      recordMarksheet,
+      
     });
 
     console.log(remarks);
@@ -427,18 +460,25 @@ const getAllFilters = async (req, res) => {
 
   const website = await Contact.distinct("website");
   
-  const companyName = await Contact.distinct("companyName");
+  const companyName = await Contact.distinct("name");
   
-  const industry = await Contact.distinct("industry");
+  const industry = await Contact.distinct("industry1");
   const industry2 = await Contact.distinct("industry2");
-  const Country = await Contact.distinct("Country");
-  const Region = await Contact.distinct("Region");
-  const companyLinkedIn = await Contact.distinct("companyLinkedIn");
+  const Country = await Contact.distinct("country");
+  const Region = await Contact.distinct("region");
+  const companyLinkedIn = await Contact.distinct("companyLinkedin");
   const name = await Contact.distinct("name");
 
+  const role = await Contact.distinct("role");
+  const result = await Contact.distinct("result");
+  const quality = await Contact.distinct("quality");
+  const free = await Contact.distinct("free");
 
+  const date = await Contact.distinct("date");
 
-  res.status(200).send({ message: "Contact filters ",name,website,companyName,industry,industry2,Country,Region,companyLinkedIn });
+  console.log(date);
+
+  res.status(200).send({ message: "Contact filters ",name,website,companyName,industry,industry2,Country,Region,companyLinkedIn,role, quality, free,result,date});
 
   
 
@@ -453,7 +493,16 @@ const upliftData = async (req, res) => {
 
   const file = req.file;
 
-  console.log(file);
+  if(!file)
+  {
+
+    console.log("hahaah",file);
+   return res.status(401).send({ message: "Empty File" });
+      
+   
+console.log("asdasdad");
+  }
+
   const { data } = req.body;
 
   
@@ -526,33 +575,8 @@ const workbook = xlsx.readFile(file.destination+file.filename);
     try {
       // Perform any additional data processing if needed
       
-      console.log(data);
-      const newaa = [
-        data['__EMPTY'],
-    
-    data['__EMPTY_1'],
-    data['__EMPTY_2'],
-    
-    data['__EMPTY_3'],
-    data['__EMPTY_4'],
-    
-    data['__EMPTY_5'],
-    data['__EMPTY_6'],
-    data['__EMPTY_7'],
-    data['__EMPTY_8'],
-    data['__EMPTY_9'],
-    data['__EMPTY_10'],
-    data['__EMPTY_11'],
-    data['__EMPTY_12'],
-    
-    data['__EMPTY_13'],
-    data['__EMPTY_19'],
-    data['__EMPTY_20'],
-    data['__EMPTY_21'],
-    data['__EMPTY_22'],
-
-    
-    ]
+  
+      const newaa = Object.values(data)
 
 
     const obj = newaa.reduce((acc, value, index) => {
@@ -561,60 +585,84 @@ const workbook = xlsx.readFile(file.destination+file.filename);
     }, {});
     
 
-    
+  
+const document = new Contact({ srno: newaa [0],
+   date:newaa[1],
+   name: newaa[2],
+   industry1: newaa[3],
+   industry2:newaa[4],
+   empcount: newaa[5],
+   phoneNumber: newaa[6],
+   website: newaa[7],
+   companyLinkedin: newaa[8],
+   city:   newaa[9],
+   country: newaa[10],
+   firstName: newaa[11],
+   lastName: newaa[12],
+   jobRole:   newaa[13],
+   email: newaa[14],
+   quality:  newaa[15],
+   result:  newaa[16],
+   free: newaa[17],
+   role: newaa[18],
+   phoneNumber2: newaa[19],
+    recordMarksheet : newaa[20]
+  });
 
-    console.log(obj)
+
+
+
+
 
 // const newdata = [data['_E']]
 
 
 
 
-    const document = new Contact({
-      name: newaa[0],
-      industry1:  newaa[1],
+    // const document = new Contact({
+    //   name: newaa[0],
+    //   industry1:  newaa[1],
       
       
-      industry2:  newaa[2],
+    //   industry2:  newaa[2],
 
-      jobRole:  newaa[2],
+    //   jobRole:  newaa[2],
     
-      phoneNumber:  newaa[4],
-      city:  newaa[5],
-      region:  newaa[6],
-      country:  newaa[7],
+    //   phoneNumber:  newaa[4],
+    //   city:  newaa[5],
+    //   region:  newaa[6],
+    //   country:  newaa[7],
       
       
       
-      website:  newaa[8],
+    //   website:  newaa[8],
       
-      empcount:  newaa[11],
+    //   empcount:  newaa[11],
     
-      industry2:  newaa[10],
+    //   industry2:  newaa[10],
       
       
-      linkedin:  newaa[13],
+    //   linkedin:  newaa[13],
       
-      date:  newaa[12],
+    //   date:  newaa[12],
 
-      email:  newaa[14],
+    //   email:  newaa[14],
       
-      remarks: newaa[15],
+    //   remarks: newaa[15],
     
-      firstName:  newaa[16],
-      lastName:  newaa[17],
+    //   firstName:  newaa[16],
+    //   lastName:  newaa[17],
     
-    }
+    // }
 
       
 
-    );
+    // );
     
 
-     console.log('Mongoose Document:', document.toObject());
-        
 
        writableStream.insert(document.toObject());
+
 
     } catch (error) {
       console.error('Error processing data:', error);
@@ -631,6 +679,10 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       
     } catch (error) {
       console.error('MongoDB stream error:', error);
+      res.status(401).send({ message: "Failed to add Data!" });
+
+    
+      
     }
   });
 
