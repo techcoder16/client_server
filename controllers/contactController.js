@@ -496,11 +496,10 @@ const upliftData = async (req, res) => {
   if(!file)
   {
 
-    console.log("hahaah",file);
+//    console.log("hahaah",file);
    return res.status(401).send({ message: "Empty File" });
       
 
-console.log("asdasdad");
   }
 
   const { data } = req.body;
@@ -650,12 +649,13 @@ const document = new Contact({
       // Execute the bulk insert
       await writableStream.execute();
       console.log('Upload complete. Closing MongoDB connection.');
-      return res.status(200).send({ message: "Contact Uplift Successfully!" });
 
+      return   res.status(200).send({ message: "Contact Uplift Successfully!" });
+   
       
     } catch (error) {
-      console.error('MongoDB stream error:', error);
-      res.status(401).send({ message: "Failed to add Data!" });
+      console.error('MongoDB stream :', error);
+     
 
     
       
@@ -666,11 +666,12 @@ const document = new Contact({
 
 
   
+  console.log("Sadasd");
 
-      res.status(200).send({ message: "Contact Uplift Successfully!" });
+
     
   } catch (err) {
-    res.status(401).send({ message: "Contact Uplift Failed!" });
+   return  res.status(401).send({ message: "Contact Uplift Failed!" });
   }
 
   
