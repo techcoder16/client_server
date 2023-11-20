@@ -91,13 +91,15 @@ const getContact = async (req, res) => {
 
 
     
+    
 
-
+console.log(skip,limit);
     const contact = await Contact.find(query).skip(skip).limit(limit);
 
-    const contactCount = await Contact.countDocuments(query);
-  
+
+    const contactCount = await Contact.countDocuments(query );
  
+
     res.status(200).send({ contact, contactCount });
 
   } catch (error) {
@@ -148,14 +150,13 @@ const updateContact = async ()=>{
   try
   {
   for (const doc of aggregatePipeline) {
-    console.log(doc)
 
     await Contact.updateOne({ _id: doc.id }, { $set: { duplicate: doc.duplicate } });
   }
 }
 catch (err)
 {
-  console.log("ASdasd",err);
+  console.log(err);
 }
   
   
@@ -476,7 +477,6 @@ const getAllFilters = async (req, res) => {
 
   const date = await Contact.distinct("date");
 
-  console.log(date);
 
   res.status(200).send({ message: "Contact filters ",name,website,companyName,industry,industry2,Country,Region,companyLinkedIn,role, quality, free,result,date});
 
@@ -539,7 +539,6 @@ const upliftData = async (req, res) => {
       // })
 
 
-console.log(file.destination+file.filename);
 
 
 
@@ -551,7 +550,7 @@ const workbook = xlsx.readFile(file.destination+file.filename);
 
   const readableStream = new Readable({ objectMode: true });
   readableStream._read = () => {};
-  stream.on('data', (data) => {   console.log("Asd",data);   readableStream.push((data))  }                   )  ;
+  stream.on('data', (data) => {  readableStream.push((data))  }                   )  ;
   stream.on('end', () => readableStream.push(null));
 
 
@@ -591,7 +590,6 @@ const workbook = xlsx.readFile(file.destination+file.filename);
       }
   
 
-    console.log(max      );
     if(newaa.length < max)
     {
 
@@ -646,9 +644,8 @@ const document = new Contact({
 
   readableStream.on('end', async () => {
     try {
-      // Execute the bulk insert
+      
       await writableStream.execute();
-      console.log('Upload complete. Closing MongoDB connection.');
 
       return   res.status(200).send({ message: "Contact Uplift Successfully!" });
    
@@ -666,8 +663,6 @@ const document = new Contact({
 
 
   
-  console.log("Sadasd");
-
 
     
   } catch (err) {
