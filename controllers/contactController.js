@@ -32,7 +32,7 @@ const getContact = async (req, res) => {
     const page = JSON.parse(req.params.payload);
 
 
-    
+    console.log(page);
 
     const limit = parseInt(req.query.limit) || 100;
 
@@ -58,6 +58,7 @@ const getContact = async (req, res) => {
     }
 
     if (page.selectedFilters.country !== "" && page.selectedFilters.country) {
+
       query.country = page.selectedFilters.country;
     }
  
@@ -85,6 +86,9 @@ const getContact = async (req, res) => {
       query.name = page.selectedFilters.name;
     }
 
+    if (page.selectedFilters.companyName !== "" && page.selectedFilters.companyName) {
+      query.name = page.selectedFilters.companyName;
+    }
     if (page.searchQuery !== "") {
       query.name = { $regex: page.searchQuery, $options: "i" };
     }
@@ -94,11 +98,12 @@ const getContact = async (req, res) => {
     
 
 console.log(skip,limit);
+console.log(query)
     const contact = await Contact.find(query).skip(skip).limit(limit);
 
 
-    const contactCount = await Contact.countDocuments(query );
- 
+    const contactCount = await Contact.countDocuments(query);
+
 
     res.status(200).send({ contact, contactCount });
 
@@ -120,6 +125,7 @@ const updateContact = async ()=>{
 
       
   const aggregatePipeline = await Contact.aggregate([
+    
     {
       $group: {
         _id: "$email",
@@ -287,7 +293,7 @@ let dateNew =      today.toISOString();
 
     res.status(200).send({ message: "Contact Created!" });
   } catch (error) {
-    console.log("ASdad",error);
+    console.log("",error);
   }
 };
 const updateContactbyID = async (req, res) => {
@@ -447,6 +453,7 @@ const deleteContactById = async (req, res) => {
       });
 
        await updateContact();
+
     res.status(200).send({ message: "Contact Deleted!" });
   } catch (error) {
     console.log(error);
@@ -510,33 +517,6 @@ const upliftData = async (req, res) => {
 
 
 
-
-        // try {
-      //     const contact = await Contact.create({
-      //       name :element[0],
-      //       wesbite: element[1],
-      //       industry1: element[2],
-      //      industry2:  element[3],
-      //       empcount: element[4],
-      //       phoneNumber : element[5],
-      //       linkedin: element[6],
-      //      city: element[7],
-      //      region: element[8],
-      //      country: element[9],
-      //      firstName: element[10],
-      //      lastName: element[11],
-      //      jobRole: element[12],
-        
-      //       duplicate:false,
-
-      //     }
-            
-            
-      //     );
-      //     await updateContact();
-
-      //   } catch (error) {}
-      // })
 
 
 
@@ -602,7 +582,7 @@ const document = new Contact({
    date:data['Date'],
    name: data['Company Name'],
    industry1: data['Industry 1'],
-   industry2:data['Industry 1'],
+   industry2:data['Industry 2'],
    empcount: data['Emp Count'],
    phoneNumber: data['Phone Number'],
    website: data['Company Website'],

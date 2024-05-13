@@ -70,14 +70,14 @@ const server = app.listen(config.port, () => {
 
 
 
-const io = socketIO(server,{
+// const io = socketIO(server,{
 
   
-    cors: {
-      origin: "http://localhost:3000",
-      methods: ["GET", "POST"]
-    }
-});
+//     cors: {
+//       origin: "http://localhost:3000",
+//       methods: ["GET", "POST"]
+//     }
+// });
 
 
 

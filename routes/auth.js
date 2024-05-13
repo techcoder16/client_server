@@ -1,5 +1,4 @@
 const express = require('express');
-
 const authMiddleware = require('../middleware/auth');
 
 const cors = require('cors'); // Import the cors package
