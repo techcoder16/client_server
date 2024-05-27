@@ -10,10 +10,12 @@ const companySchema = new mongoose.Schema({
     industry2 : {type: String,default: "",}, 
     companyLinkedIn : {type: String,default: "",},
     Region:{type:String,default: "",},
+    city:{type:String,default: "",},
+    
     Country:{type:String,default: "",},
     name:{type:String,default: "",},
     date:{type:Date,default: "",},
-    
+      
     
 });
 

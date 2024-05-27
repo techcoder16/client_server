@@ -14,6 +14,13 @@ router.get('/get_screen_by_id/:ID', screen.getScreenbyId);
 router.get('/get_screen_by_object_id/:ID', screen.getScreenbyObjectId);
 
 
+router.get('/get_screen_by_UserID/:ID', screen.get_screen_by_UserId);
+
+router.get('/auth_screen_check', screen.authScreenRights);
+
+
+
+
 router.get('/get_screen_list/:ID', screen.getAllScreens);
 router.get('/get_screen_id_by_name/:screen_name', screen.getIdbyName);
 

@@ -105,50 +105,43 @@ const user_logout = async (req, res) => {
 
 const get_user = async (req, res) => {
   try {
-    const user = await User.find({});
+ 
+   
+    const page = JSON.parse(req.params.payload);
+    const limit = parseInt(req.query.limit) || 100;
+    const skip = (page.page - 1) * limit;
+    const query = {};
+    if (page.searchQuery !== "" && page.searchQuery) {
+      query.name = page.searchQuery;
+    }
+    query.role  = 'user';
 
-    if (!user) {
-      return res.status(401).json({ message: "No User Found" });
+    const users = await User.find(query,{_id:1,email:1,username:1,phoneNumber:1,name:1}).skip(skip).limit(limit);
+    const userCount = await User.countDocuments(query);
+    
+
+    if (!users) {
+      return res.status(401).json({ message: "No User Found" });  
     } else {
-      res.json({ message: "Successfully Get All Users", user });
+      res.json({ message: "Successfully Get All Users", users ,userCount });
+
     }
   } catch (err) {
     return res.status(401).json({ message: "User Error" });
   }
 };
 
+
 const create_user = async (req, res) => {
-  const { username,email, password, role,type,address,phoneNumber } = req.body;
+  const { username,email, password, role,type,address,phoneNumber ,name } = req.body;
 
   
   try {
 
 
-    if(type == 'google') 
-    {
-      if (username === "") {
-        return res
-          .status(401)
-          .json({ message: "Cannot Create User with empty name" });
-      }
   
 
- 
 
-    res.status(200).send({ message: "Sign Up Successfull!" });
-
-
-
-
-
-    }
-    else if  (type == 'facebook')
-    {
-
-
-    }
-else
-{
   
     if (username === "") {
       return res
@@ -156,21 +149,17 @@ else
         .json({ message: "Cannot Create User with empty name" });
     }
 
-    const checkSameUser = await User.findOne({ username: username });
+    const checkSameUser = await User.findOne({ email: email });
 
+    console.log(checkSameUser)
     if (checkSameUser || checkSameUser &&  checkSameUser.length > 0) {
       return res
         .status(401)
-        .json({ message: "Cannot Create User with same name" });
+        .json({ message: "Cannot Create User with email" });
     }
 
     const result = await User.find().sort({ id: -1 }).limit(1);
-    let id = 1;
-
-    if (result[0] !== undefined) {
-      id = parseInt(result[0].id) + 1;
-    }
-    id = id.toString();
+ 
 
     const saltRounds = 10;
 
@@ -178,21 +167,18 @@ else
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newUser = await User.create({
-      id: id,
+   
       username: username,
       password: hashedPassword,
       email:email,
-     address:address,
+      name:name,
        phoneNumber:phoneNumber,
 
-      file: "none",
-      role: role,
-      token: "",
     });
 
     res.status(200).send({ message: "User Created!" });
  
-  }
+  
 
  
  
@@ -599,28 +585,6 @@ const  getAvatar = async (req, res) => {
 
 
   
-const delete_contact = (req, res) => {
-  const { ID } = req.body;
-  
-  try {
-    let newUser =  Contact.findOneAndRemove({ _id: ID })
-      .then((element) => {
-        console.log("Contact deleted:", element);
-      })
-      .catch((error) => {
-        console.error("Error Contact User:", error);
-      });
-
-    res.status(200).send({ message: "Contact Deleted!" });
-  } catch (error) {
-    console.log(error);
-    res.status(401).send({ message: "Contact Cannot be Deleted!" });
-  }
-};
-
-
-  
-  
 
 
 module.exports = {
@@ -644,6 +608,6 @@ module.exports = {
   getContacts,
   update_user_profile,
   getAvatar,
-  delete_contact,
+
   
 };

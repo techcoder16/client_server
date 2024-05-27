@@ -1,5 +1,6 @@
 const Company = require("../models/Company");
-
+const { Readable } = require("stream");
+const xlsx = require("xlsx");
 // const getcompany = async (req, res) => {
 //   try {
 //     const company = await Company.find({});
@@ -20,17 +21,17 @@ const getcompany = async (req, res) => {
   try {
 
     
-    
+
       const page = JSON.parse(req.params.payload);
 
-    
+      console.log(page);
 
 
 
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page.page - 1) * limit;
-    
+      console.log(page.searchQuery,page)
 
     const explainResult = await Company.find({}).explain();
 
@@ -64,10 +65,12 @@ const getcompany = async (req, res) => {
     }
 
     if (page.searchQuery !== "") {
-      query.name = { $regex: page.searchQuery, $options: "i" };
+      query.companyName = { $regex: page.searchQuery, $options: "i" };
     }
 
+    console.log(query);
 
+    
     
 
 
@@ -89,51 +92,146 @@ const getcompany = async (req, res) => {
 
 
 const upliftData = async (req, res) => {
-  const { data } = req.body;
+  // const { data } = req.body;
 
   
-  try {
+  // try {
    
 
-    if (data) {
-      data.map(async (element) => {
+  //   if (data) {
+  //     data.map(async (element) => {
         
 
 
 
 
     
-        try {
-          const contact = await Company.create({
-           companyName: element[0],
-            name :element[1],
-           website: element[2],
-           industry: element[3],
-           industry2: element[4],
-           companyLinkedIn: element[5],
-            Country: element[6],
-            Region:element[7],
-            duplicate:false,
+  //       try {
+  //         const contact = await Company.create({
+  //          companyName: element[0],
+  //           name :element[1],
+  //          website: element[2],
+  //          industry: element[3],
+  //          industry2: element[4],
+  //          companyLinkedIn: element[5],
+  //           Country: element[6],
+  //           Region:element[7],
+  //           duplicate:false,
 
             
-           });
+  //          });
        
-           await updateCompany();
-        } catch (error) {
+  //          await updateCompany();
+  //       } catch (error) {
 
-          console.log(error);
-        }
-      });
+  //         console.log(error);
+  //       }
+  //     });
 
  
 
-      res.status(200).send({ message: "Company Uplift Successfully!" });
-    } else {
-      res.status(401).send({ message: "Company Uplift Failed!" });
-    }
-  } catch (err) {
-    res.status(401).send({ message: "Company Uplift Failed!" });
+  //     res.status(200).send({ message: "Company Uplift Successfully!" });
+  //   } else {
+  //     res.status(401).send({ message: "Company Uplift Failed!" });
+  //   }
+  // } catch (err) {
+  //   res.status(401).send({ message: "Company Uplift Failed!" });
+  // }
+
+  const file = req.file;
+
+  if (!file) {
+
+    return res.status(401).send({ message: "Empty File" });
   }
+
+  
+  try {
+
+    const workbook = xlsx.readFile(file.destination + file.filename);
+    
+    const sheetName = workbook.SheetNames[0];
+  
+    const worksheet  = workbook.Sheets[sheetName];
+    const stream = xlsx.stream.to_json(worksheet);
+
+
+  
+    const readableStream = new Readable({ objectMode: true });
+    readableStream._read = () => {};
+
+    stream.on("data", (data) => {
+
+      readableStream.push(data);
+    });
+    stream.on("end", () => readableStream.push(null));
+
+    const writableStream = Company.collection.initializeOrderedBulkOp();
+
+
+    let max = 0;
+
+    readableStream.on("data", async (data) => {
+     
+
+      try {
+        // Perform any additional data processing if needed
+
+        const newaa = Object.values(data);
+
+        // const obj = newaa.reduce((acc, value, index) => {
+        //   acc[index] = value;
+        //   return acc;
+        // }, {});
+
+        if (max < newaa.length) {
+          max = newaa.length;
+        }
+
+        if (newaa.length < max) {
+          // console.log(data);
+        }
+
+
+        const document = new Company({
+
+
+          companyName: data["Company Name"],
+          
+          industry: data["Industry 1"],
+          industry2: data["Industry 2"],
+          website: data["Company Website"],
+          companyLinkedin: data["Company LinkedIn"],
+          Country: data["Country"],
+          city: data["City"],
+          Region:"",
+          duplicate:false,
+          
+        });
+
+        writableStream.insert(document.toObject());
+      } catch (error) {
+
+        console.error("Error processing data:", error);
+      }
+    });
+
+    readableStream.on("end", async () => {
+      try {
+        await writableStream.execute();
+
+        return res
+          .status(200)
+          .send({ message: "Contact Uplift Successfully!" });
+      } catch (error) {
+        console.error("MongoDB stream :", error);
+      }
+    });
+  } catch (err) {
+    console.log(err)
+    return res.status(401).send({ message: "Contact Uplift Failed!" });
+  }
+
 
   
 };
@@ -141,36 +239,34 @@ const upliftData = async (req, res) => {
 
 
 
-const updateCompany = async ()=>{
+const updateCompany = async (email)=>{
 
-      
   const aggregatePipeline = await Company.aggregate([
+    { $match: { email: email } },
     {
       $group: {
-        _id: "$website",
+        _id: "$email",
         count: { $sum: 1 },
-        docs: { $push: "$_id" }
-      }
+        docs: { $push: "$_id" },
+      },
     },
     {
-      $unwind: "$docs"
+      $unwind: "$docs",
     },
     {
-
       $project: {
         _id: 0,
         id: "$docs",
         duplicate: {
           $cond: {
             if: { $eq: ["$count", 1] },
-            then: false, 
-            else: true
-          }
-        }
-      }
-    }
+            then: false,
+            else: true,
+          },
+        },
+      },
+    },
   ]);
-  
  
   for (const doc of aggregatePipeline) {
     await Company.updateOne({ _id: doc.id }, { $set: { duplicate: doc.duplicate } });
@@ -293,7 +389,7 @@ const updatecompanybyID = async (req, res) => {
  
   
     
-   await updateCompany(); 
+   await updateCompany(email); 
     
 
 
@@ -385,10 +481,11 @@ const deletecompanyById = async (req, res) => {
         console.error("Error deleting company:", error);
       });
 
+      await updateCompany(company.email);
+
     res.status(200).send({ message: "Company Deleted!" });
 
 
-    await updateCompany();
   } catch (error) {
     console.log(error);
     res.status(401).send({ message: "company Cannot be Deleted!" });

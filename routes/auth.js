@@ -35,10 +35,11 @@ router.post('/login', auth.user_login );
 router.post('/create_user', auth.create_user);
 router.post('/update_user', auth.update_user);
 router.post('/delete_user', auth.delete_user_by_id);
-router.get('/get_user', auth.get_user);
+router.get('/get_user/:payload', auth.get_user);
 router.get('/get_user_by_id/:ID',auth.get_user_by_id);
 router.get('/get_user_list/:ID', auth.get_all_users);
-router.get('/get_menu_by_oid/:ID', auth.get_user_by_basic_id);
+router.get('/get_user_by_oid/:ID', auth.get_user_by_basic_id);
+
 router.get('/get_id_name/:username', auth.get_id_by_name);
 
 router.get('/get_roles', auth.get_roles);
@@ -63,9 +64,6 @@ router.get('/get_avatar/:id', auth.getAvatar);
 
 
 router.post('/update_user_profile', upload.single('avatar'), auth.update_user_profile);
-
-router.post('/delete_contact',auth.delete_contact);
-
 
 
 

@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  lastName:{
+  email:{
     type: String,
     required: false,
   },
@@ -38,60 +38,20 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: false,
-    enum : ["user","admin"],
+
     default: 'user',
 
   },
 
-  company:{
-    type: String,
-    default: '',
-  },
+ 
   
-  website:{
-    type: String,
-    default: '',
-  },
   
   name:{
     type: String,
     default: '',
   },
-  
-  email:{
-    type: String,
-    default: '',
-  },
-  bankname:{
-    type: String,
-    default: '',
-  },
-  
-  profilePicture:{
-    type: String,
-    default: '',
-  },
-  balance:{
-    type: Number,
-    default: 0,
-  },
-  
 
-  paymentMethod:{
-    type: [String],
-    default: 0,
-  },
-  
-  avatar:{
-    type:{},
-    default: 0,
-  },
-  
 
-  accountNumber:{
-    type: String,
-    default: "",
-  },
 
   token: {
     type: String,
