@@ -16,7 +16,7 @@ const connectDB = async () => {
      
       const hashedPassword = await bcrypt.hash('123', 10); // Hash the password
       await User.create({ username: 'admin', password: hashedPassword,file:'none', role: 'admin',token:' ' ,email:"admin@gmail.com"});
-        console.log('Default admin user created');
+    
 
 
     }

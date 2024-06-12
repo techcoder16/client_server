@@ -114,7 +114,7 @@ const get_user = async (req, res) => {
     if (page.searchQuery !== "" && page.searchQuery) {
       query.name = page.searchQuery;
     }
-    query.role  = 'user';
+    
 
     const users = await User.find(query,{_id:1,email:1,username:1,phoneNumber:1,name:1}).skip(skip).limit(limit);
     const userCount = await User.countDocuments(query);
@@ -459,6 +459,8 @@ const deleteAuthScreen = async (req, res) => {
 
 const getAuthScreens = async (req, res) => {
   try {
+
+
     const authuser = await AuthScreen.find({});
 
     if (!authuser) {

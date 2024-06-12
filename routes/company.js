@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
       const fileName = `${Date.now()}-${file.originalname}`;
-      console.log(fileName);
+      
       cb(null, fileName);
     },
   });

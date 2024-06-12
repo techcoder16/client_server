@@ -33,6 +33,7 @@ const getContact = async (req, res) => {
     const explainResult = await Contact.find({}).explain();
 
     const query = {};
+    
 
     if (page.selectedFilters.website !== "" && page.selectedFilters.website) {
       query.website = page.selectedFilters.website;
@@ -91,17 +92,30 @@ const getContact = async (req, res) => {
     if (page.searchQuery !== "") {
       query.name = { $regex: page.searchQuery, $options: "i" };
     }
+    const andConditions = [];
+    if (page.selectedFilters?.empcount) {
+      const [lowerLimit, upperLimit] = page.selectedFilters.empcount.split('-').map(Number);
+      if (!isNaN(lowerLimit) && !isNaN(upperLimit)) {
+        query.empcount = { "$gt": lowerLimit, "$lt": upperLimit };
+      } else {
+     
+        console.error("Invalid empcount values detected");
+      }
+    }
+    
+
 
     console.log(skip, limit);
-    console.log(query);
-    const contact = await Contact.find(query).skip(skip).limit(limit);
+    console.log("myquer",query);
+    const contact = await Contact.find(query).skip(skip).limit(limit);  
 
     const contactCount = await Contact.countDocuments(query);
 
     res.status(200).send({ contact, contactCount });
   } catch (error) {
+    console.log(error)
     res
-
+    
       .status(500)
       .json({ error: "An error occurred while retrieving products" });
   }
@@ -198,31 +212,7 @@ const createContact = async (req, res) => {
       remarks == "" ||
       recordMarksheet == ""
     ) {
-      console.log({
-        date,
-        name,
-        industry1,
-        industry2,
-        empcount,
-        phoneNumber,
-        website,
-        companyLinkedin,
-        city,
-        region,
-        country,
-        firstName,
-        lastName,
-        jobRole,
-        email,
-        quality,
-        result,
-        free,
-        role,
-        phoneNumber2,
-        linkedin,
-        remarks,
-        recordMarksheet,
-      });
+   
       res.status(401).send({ message: "Field Empty!" });
       return;
     }
@@ -230,7 +220,7 @@ const createContact = async (req, res) => {
     const today = new Date(timeElapsed);
     let dateNew = today.toISOString();
 
-    console.log(timeElapsed.toString());
+    
     const contact = Contact.create({
       date,
       name,
@@ -423,43 +413,111 @@ const deleteContactById = async (req, res) => {
 };
 
 const getAllFilters = async (req, res) => {
-  const website = await Contact.distinct("website");
+  try {
+    const fields = [
+      "website",
+      "name",
+      "industry1",
+      "industry2",
+      "country",
+      "region",
+      
+      "companyLinkedin",
+      "role",
+      "result",
+      "quality",
+      "free",
+      "date"
+    ];
 
-  const companyName = await Contact.distinct("name");
+    // Create an array of promises for distinct queries
+    const distinctPromises = fields.map(field => Contact.distinct(field).exec());
 
-  const industry = await Contact.distinct("industry1");
-  const industry2 = await Contact.distinct("industry2");
-  const Country = await Contact.distinct("country");
-  const Region = await Contact.distinct("region");
-  const companyLinkedIn = await Contact.distinct("companyLinkedin");
-  const name = await Contact.distinct("name");
+    // Execute all distinct queries in parallel
+    const results = await Promise.all(distinctPromises);
 
-  const role = await Contact.distinct("role");
-  const result = await Contact.distinct("result");
-  const quality = await Contact.distinct("quality");
-  const free = await Contact.distinct("free");
+    // Map the results to respective fields
+    const response = {
+      name:results[1],
+      website: results[0],
+      companyName: results[1],
+      industry: results[2],
+      industry2: results[3],
+      Country: results[4],
+      Region: results[5],
+      companyLinkedIn: results[6],
+      role: results[7],
+      result: results[8],
+      quality: results[9],
+      free: results[10],
+      date: results[11],
+      empcount: ['1-100', '101-200', '201-500', '501-1000']
+    };
 
-  const date = await Contact.distinct("date");
+    // Map the results to respective fields
+   
 
-  res
-    .status(200)
-    .send({
-      message: "Contact filters ",
-      name,
-      website,
-      companyName,
-      industry,
-      industry2,
-      Country,
-      Region,
-      companyLinkedIn,
-      role,
-      quality,
-      free,
-      result,
-      date,
+    // Add empcount to the response
+    response.empcount = ['0-50','51-100','101-200','201-500','501-1000'];
+
+    // Send the response
+    
+    res.status(200).send({
+      message: "Contact filters",
+      ...response
     });
+  } catch (error) {
+    res.status(500).send({
+      message: "An error occurred while fetching contact filters.",
+      error: error.message
+    });
+  }
 };
+
+
+
+// const getAllFilters = async (req, res) => {
+//   const website = await Contact.distinct("website");
+
+//   const companyName = await Contact.distinct("name");
+
+//   const industry = await Contact.distinct("industry1");
+//   const industry2 = await Contact.distinct("industry2");
+//   const Country = await Contact.distinct("country");
+//   const Region = await Contact.distinct("region");
+//   const companyLinkedIn = await Contact.distinct("companyLinkedin");
+//   const name = await Contact.distinct("name");
+
+//   const role = await Contact.distinct("role");
+//   const result = await Contact.distinct("result");
+//   const quality = await Contact.distinct("quality");
+//   const free = await Contact.distinct("free");
+
+//   const date = await Contact.distinct("date");
+  
+//   const empcount = ['1-100','101-200','201-500','501-1000']
+
+//   res
+//     .status(200)
+//     .send({
+//       message: "Contact filters ",
+//       name,
+//       website,
+//       companyName,
+//       industry,
+//       industry2,
+//       Country,
+//       Region,
+//       companyLinkedIn,
+//       role,
+//       quality,
+//       free,
+//       result,
+//       date,
+//       empcount
+
+//     });
+// };
 
 const upliftData = async (req, res) => {
   const file = req.file;
