@@ -36,10 +36,15 @@ router.get('/get_company_by_id/:ID', company.getcompanybyId);
 router.get('/get_company_list/:ID', company.getAllcompanys);
 router.get('/get_company_by_oid/:ID', company.getcompanybyBasicId);
 router.get('/get_id_name/:company_name', company.getIdbyName);
-router.get('/get_filters',company.getFilterData);
+router.get('/get_filters/:payload',company.getFilterData);
 
+router.get('/get_number_of_companies',company.getNumberOfData);
 
 router.post('/upload', upload.single('file'),company.upliftData);
+router.get('/get_company_count_by_industry', company.getCompanyCountByIndustry1);
+
+// Route to get company count by industry2
+router.get('/get_company_count_by_industry_2', company.getCompanyCountByIndustry2);
 
 module.exports = router;
 

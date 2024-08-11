@@ -151,7 +151,6 @@ const create_user = async (req, res) => {
 
     const checkSameUser = await User.findOne({ email: email });
 
-    console.log(checkSameUser)
     if (checkSameUser || checkSameUser &&  checkSameUser.length > 0) {
       return res
         .status(401)
