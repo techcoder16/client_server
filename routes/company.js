@@ -43,7 +43,6 @@ router.get('/get_number_of_companies',company.getNumberOfData);
 router.post('/upload', upload.single('file'),company.upliftData);
 router.get('/get_company_count_by_industry', company.getCompanyCountByIndustry1);
 
-// Route to get company count by industry2
 router.get('/get_company_count_by_industry_2', company.getCompanyCountByIndustry2);
 
 module.exports = router;
