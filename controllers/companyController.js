@@ -38,7 +38,7 @@ const getcompany = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page.page - 1) * limit;
-      console.log(page.searchQuery,page)
+      
 
     const explainResult = await Company.find({}).explain();
 
@@ -75,7 +75,6 @@ const getcompany = async (req, res) => {
       query.companyName = { $regex: page.searchQuery, $options: "i" };
     }
 
-    console.log(query);
 
     
     
@@ -566,7 +565,6 @@ const aggregateAndFormat = async (field, filters) => {
   if (filters && filters[field] && filters[field] !== null) {
     matchStage[field] = { $regex: filters[field], $options: 'i' }; // 'i' for case-insensitive matching
   }
-
   // Aggregate pipeline
   const pipeline = [
     { $match: matchStage },

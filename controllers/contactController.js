@@ -22,7 +22,6 @@ const { Readable } = require("stream");
 
 const getContact = async (req, res) => {
   try {
-    console.log(req.params);
 
     // Safely parse `page` from `req.params`
     let page;
@@ -427,10 +426,9 @@ const aggregateAndFormat = async (field, filters) => {
 const getAllFilters = async (req, res) => {
   try {
 
-    console.log("Asdkjasdjkha")
 
     const data = JSON.parse(req.params.payload);
-    console.log(data);
+    
     const fields = [
       
       "role",
@@ -462,7 +460,6 @@ const getAllFilters = async (req, res) => {
     // Execute all distinct queries in parallel
     const results = await Promise.all(distinctPromises);
 
-    console.log(companyName);
     // Map the results to respective fields
     const response = {
       name,
@@ -613,7 +610,7 @@ const getNumberOfData = async (req, res) => {
       const formattedCount = formatNumber(contactCount);
 
       // Log the formatted count
-      console.log(formattedCount);
+      
 
       res.status(200).json({
           contact: formattedCount
@@ -628,7 +625,6 @@ const getNumberOfData = async (req, res) => {
 const getContactsByCountry = async (req, res) => {
   try {
     
-    console.log('Getting contacts');
       const result = await Contact.aggregate([
           { $group: { _id: "$country", count: { $sum: 1 } } },
           { $sort: { count: -1 } }
@@ -648,6 +644,48 @@ const getContactsByCountry = async (req, res) => {
   }
 };
 
+const getDataForBarChart = async (req, res) => {
+  try {
+    // Decode and parse query parameters
+    const queryParams = JSON.parse(decodeURIComponent(req.params.data));
+
+    // Validate the query parameters
+    if (!queryParams.xColumn || !queryParams.yColumn) {
+      return res.status(400).json({ error: 'xColumn and yColumn are required' });
+    }
+
+    const result = await Contact.aggregate([
+      {
+        $group: {
+          _id: `$${queryParams.xColumn}`, // Group by the xColumn value
+          total: { $sum: `$${queryParams.yColumn}` } // Use $sum to aggregate yColumn values
+        }
+      },
+      { 
+        $sort: { "_id": 1 } // Optional: sort by x-axis values
+      }
+    ]);
+    console.log(result);
+    // Format result to be compatible with the bar chart
+    const formattedResult = {
+      labels: result.map(item => item._id || 'Unknown'), // x-axis labels
+      datasets: [{
+        label: queryParams.yColumn, // y-axis label
+        data: result.map(item => item.total || 0), // y-axis data
+        backgroundColor: 'rgba(32, 37, 63, 0.2)',
+        borderColor: 'rgba(32, 37, 63, 1)',
+        borderWidth: 3
+      }]
+    };
+
+    
+    res.status(200).json(formattedResult);
+
+  } catch (err) {
+    console.error('Error fetching data for bar chart:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 
 module.exports = {
@@ -663,4 +701,5 @@ module.exports = {
   getAllFilters,
   getNumberOfData,
   upliftData,
+  getDataForBarChart
 };

@@ -405,6 +405,7 @@ const delete_user_by_id = (req, res) => {
     let newUser = User.findOneAndRemove({ _id: ID })
       .then((element) => {
         console.log("User deleted:", element);
+        
       })
       .catch((error) => {
         console.error("Error deleting User:", error);

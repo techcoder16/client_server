@@ -35,7 +35,7 @@ router.get('/get_filters/:payload',contact.getAllFilters);
 router.post('/upload', upload.single('file'),contact.upliftData);
 router.get('/get_number_of_contacts',contact.getNumberOfData);
 router.get('/get_contact_by_country',contact.getContactsByCountry)
-
+router.get('/get_bar_chart/:data',contact.getDataForBarChart)
 // router.post('/uplift_data', contact.upliftData);
 
 module.exports = router;
