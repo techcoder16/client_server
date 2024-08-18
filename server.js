@@ -20,7 +20,6 @@ const contactRoutes = require('./routes/contact');
 const config = require('./config');
 
 
-var passport    = require('passport');
 
 
 const cookieSession = require("cookie-session");

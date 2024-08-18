@@ -5,8 +5,7 @@ const cors = require('cors'); // Import the cors package
 
 const router = express.Router();
 const auth = require ('../controllers/authController');
-require('../utils/passport');
-const passport = require('passport');
+
 const multer = require('multer');
 const User = require('../models/User'); // Import your User model
 
@@ -81,36 +80,7 @@ res.status(200).send({message: 'Test'});
 
 
 });
-  
-router.get('/callback', passport.authenticate('google', {
 
-  failureRedirect: '/login' 
-}),
-(req, res) => {
-
-
-  if (req.user && req.authInfo.message === 'User already exists') {
-   
-    res.status(200).send({message: 'User already exists'});
-   return
-
-  } else {
-
-    
-    res.status(400).send({message: 'Signup Successfully'});
-    return
-  }
-  
-
-  
-});
-
-
-
-
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
 
 
 

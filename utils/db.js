@@ -14,7 +14,7 @@ const connectDB = async () => {
     const adminUser = await User.findOne({ email: 'admin@gmail.com' });
     if (!adminUser) {
      
-      const hashedPassword = await bcrypt.hash('123', 10); // Hash the password
+      const hashedPassword = await bcrypt.hash('2XH&4gBn5i$v&H', 10); // Hash the password
       await User.create({ username: 'admin', password: hashedPassword,file:'none', role: 'admin',token:' ' ,email:"admin@gmail.com"});
     
 

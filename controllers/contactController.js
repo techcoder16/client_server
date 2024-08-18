@@ -79,6 +79,12 @@ const getContact = async (req, res) => {
     if (selectedFilters.companyName) {
       query.name = selectedFilters.companyName;
     }
+    if (selectedFilters.city) {
+      query.city = selectedFilters.city;
+    }
+    
+    console.log(selectedFilters);
+    // Hand
     
     // Handle search query
     if (page.searchQuery) {
@@ -448,6 +454,7 @@ const getAllFilters = async (req, res) => {
     const industry2 = await aggregateAndFormat('industry2', data);
     
 
+    const city = await aggregateAndFormat('city', data);
     
     const Country = await aggregateAndFormat('country', data);
     const Region = await aggregateAndFormat('Region', data);
@@ -476,7 +483,8 @@ const getAllFilters = async (req, res) => {
       quality: results[2],
       free: results[3],
       date,
-      empcount: ['1-100', '101-200', '201-500', '501-1000']
+      empcount: ['1-100', '101-200', '201-500', '501-1000'],
+      city,
     };
     
     // Map the results to respective fields
