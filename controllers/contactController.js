@@ -509,12 +509,10 @@ const getAllFilters = async (req, res) => {
 };
 
 
-
 const upliftData = async (req, res) => {
   const file = req.file;
 
   if (!file) {
-    
     return res.status(401).send({ message: "Empty File" });
   }
 
@@ -534,25 +532,21 @@ const upliftData = async (req, res) => {
     });
     stream.on("end", () => readableStream.push(null));
 
-    const writableStream = Contact.collection.initializeOrderedBulkOp();
+    const emailSet = new Set();
+    const documents = [];
 
-   
-    let max = 0;
-
-    readableStream.on("data", async (data) => {
+    readableStream.on("data", (data) => {
       try {
-        // Perform any additional data processing if needed
+        // Extract the email from the current row
+        const email = data["Email"];
 
-        const newaa = Object.values(data);
-
-
-        if (max < newaa.length) {
-          max = newaa.length;
+        // Skip if the email is already in the set (duplicate)
+        if (emailSet.has(email)) {
+          return;
         }
 
-        if (newaa.length < max) {
-          
-        }
+        // Add email to the set
+        emailSet.add(email);
 
         const document = new Contact({
           srno: data["Sr #"],
@@ -565,7 +559,6 @@ const upliftData = async (req, res) => {
           website: data["Company Website"],
           companyLinkedin: data["Company LinkedIn"],
           city: data["City"],
-
           country: data["Country"],
           firstName: data["First Name"],
           lastName: data["Last Name"],
@@ -576,13 +569,12 @@ const upliftData = async (req, res) => {
           free: data["free"],
           role: data["role"],
           phoneNumber2: data["Phone Number 2"],
-
           linkedin: data["Linkedin"],
           remarks: data["Remarks"],
           recordMarksheet: data["Record in Mastersheet"],
         });
 
-        writableStream.insert(document.toObject());
+        documents.push(document.toObject());
       } catch (error) {
         console.error("Error processing data:", error);
       }
@@ -590,19 +582,24 @@ const upliftData = async (req, res) => {
 
     readableStream.on("end", async () => {
       try {
-        await writableStream.execute();
+        if (documents.length > 0) {
+          // Insert all unique documents into MongoDB
+          await Contact.collection.insertMany(documents);
+        }
 
-        return res
-          .status(200)
-          .send({ message: "Contact Uplift Successfully!" });
+        return res.status(200).send({ message: "Contact Uplift Successfully!" });
       } catch (error) {
-        console.error("MongoDB stream :", error);
+        console.error("MongoDB insertMany error:", error);
+        return res.status(500).send({ message: "Failed to insert contacts!" });
       }
     });
   } catch (err) {
+    console.error("Error processing file:", err);
     return res.status(401).send({ message: "Contact Uplift Failed!" });
   }
 };
+
+
 
 const formatNumber = (number) => {
   if (number < 1000) return number; 
